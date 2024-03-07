@@ -3,6 +3,7 @@
  * By Heyang Yu (jhyyu@bu.edu)
  * This class is to handle user input in the terminal.
  */
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class InputHandler {
@@ -40,8 +41,25 @@ public class InputHandler {
         }
         return returnString;
     }
+    // get a string witin a valid set
+    public static String getAValidChoiceString(String prompt, String[] validInputs) {
+        Scanner scanner = new Scanner(System.in);
+        boolean isValidInput = false;
+        String input = "";
+        System.out.print(prompt + ", valid choices are " + Arrays.toString(validInputs) + ": ");
+        while(!isValidInput) {
+            input = scanner.nextLine();
+            if (Arrays.asList(validInputs).contains(input)) {
+                isValidInput = true;
+            } else {
+                System.out.print("Invalid input. Please enter one of the following: " + Arrays.toString(validInputs) + ": ");
+            }
+        }
+
+        return input;
+    }
     public static void main(String[] args) {
-        String teamname = getANonEmptyString("Team 1, please input your team name: ");
+        String teamname = getAValidChoiceString("Please input side", new String[]{"a", "1", "wq"});
         System.out.println(teamname);
     }
 }
