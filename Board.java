@@ -79,4 +79,62 @@ public class Board {
         System.out.print("+");
         System.out.println();
     }
+    // display a board with index
+    public void displayIndexedBoard() {
+        for(int i = 0; i <= getColNum(); i++) {
+            System.out.print("  ");
+            System.out.print(i);
+        }
+        System.out.println();
+        //System.out.println();
+        for (int i = 0; i < getRowNum(); i++) {
+            System.out.print(i + " ");
+            for(int j = 0; j < getColNum(); j++) {
+                System.out.print("+");
+                // top
+                if(getTile(i, j).getPiece(1) != null) {
+                    Color.print(getTile(i, j).getPiece(1).getColor(), "--");
+                }else {
+                    System.out.print("  ");
+                }
+            }
+            System.out.print("+");
+            System.out.println();
+            System.out.print("  ");
+            for (int j = 0; j < getColNum(); j++) {
+                // left for each grid
+                if(getTile(i, j).getPiece(3) != null) {
+                    Color.print(getTile(i, j).getPiece(3).getColor(), "|");
+                }else {
+                    System.out.print(" ");
+                }
+                Tile tile = tiles[i][j];
+                // center
+                if (tile.getPiece(0).getValue() != null) {
+                    Color.print(getTile(i, j).getPiece(0).getColor(), "%-2s", tile.getPiece(0).getValue());
+                } else {
+                    System.out.print("  ");
+                }
+            }
+            // right edge for last grid of each row
+            if(getTile(i, getColNum() - 1).getPiece(4) != null) {
+                Color.print(getTile(i, getColNum() - 1).getPiece(4).getColor(), "|");
+            }else {
+                System.out.print(" ");
+            }
+            System.out.println();
+        }
+        System.out.print(this.getRowNum() + " ");
+        for(int j = 0; j < getColNum(); j++) {
+            System.out.print("+");
+            // bottom
+            if(getTile(getRowNum() - 1, j).getPiece(2) != null) {
+                Color.print(getTile(getRowNum() - 1, j).getPiece(2).getColor(), "--");
+            }else {
+                System.out.print("  ");
+            }
+        }
+        System.out.print("+");
+        System.out.println();
+    }
 }

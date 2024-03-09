@@ -6,7 +6,7 @@
  */
 public class Piece {
     private String value;
-    private String color; // 0: white, 1: red, 2: blue
+    private String color;
     public static final int WHITE = 0;
     public static final int RED = 1;
     public static final int BLUE = 2;

@@ -35,6 +35,13 @@ public class Color {
             colors.add(WHITE);
             colors.add(BLACK);
         }
+        if(game.equalsIgnoreCase("Quoridor")) {
+            // add colors in the order which matches the order defined in d&b
+            colors.add(RED);
+            colors.add(BLUE);
+            colors.add(YELLOW);
+            colors.add(GREEN);
+        }
         return colors;
     }
     // initialize color names
@@ -50,6 +57,13 @@ public class Color {
             colorNames.add("Cyan");
             colorNames.add("White");
             colorNames.add("Black");
+        }
+        if(game.equalsIgnoreCase("Quoridor")) {
+            // add the names of the colors
+            colorNames.add("Red");
+            colorNames.add("Blue");
+            colorNames.add("Yellow");
+            colorNames.add("Green");
         }
         return colorNames;
     }

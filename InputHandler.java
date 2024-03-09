@@ -46,13 +46,13 @@ public class InputHandler {
         Scanner scanner = new Scanner(System.in);
         boolean isValidInput = false;
         String input = "";
-        System.out.print(prompt + ", valid choices are " + Arrays.toString(validInputs) + ": ");
+        System.out.print(prompt);
         while(!isValidInput) {
             input = scanner.nextLine();
             if (Arrays.asList(validInputs).contains(input)) {
                 isValidInput = true;
             } else {
-                System.out.print("Invalid input. Please enter one of the following: " + Arrays.toString(validInputs) + ": ");
+                System.out.print("Invalid input! " + prompt);
             }
         }
 

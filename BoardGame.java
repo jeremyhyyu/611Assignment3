@@ -40,7 +40,7 @@ public class BoardGame {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             // ask for user's choice
-            System.out.println("Which game do you want to play? 1: Slider 2: Dots and Boxes Q: Quit");
+            System.out.println("Which game do you want to play? 1: Slider 2: Dots and Boxes 3: Quoridor Q: Quit");
             String userChoice = scanner.nextLine();
             if(userChoice.equals("1")) {
                 System.out.println("You chose Slider.");
@@ -69,7 +69,17 @@ public class BoardGame {
                 Board board = new Board(height, width);
                 DotsAndBoxes db = new DotsAndBoxes(board, teamCnt);
                 db.firstGame();
-            }else if(userChoice.equalsIgnoreCase("q")) {
+            } else if(userChoice.equalsIgnoreCase("3")){
+                System.out.println("You chose Quoridor");
+                // get side length
+                int sideLen = InputHandler.getAnIntegerInARange("length of side", Quoridor.MIN_SIDE_LENGTH, Quoridor.MAX_SIDE_LENGTH);
+                // get number of teams
+                int teamCnt = InputHandler.getAnIntegerInARange("number of teams", Quoridor.MIN_TEAM, Quoridor.MAX_TEAM);
+                // create the Quoridor game and play
+                Board board = new Board(sideLen, sideLen);
+                Quoridor quoridor = new Quoridor(board, teamCnt);
+                quoridor.firstGame();
+            } else if(userChoice.equalsIgnoreCase("q")) {
                 // quit the program
                 System.out.println("See you next time!");
                 break;
