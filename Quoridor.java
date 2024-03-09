@@ -68,13 +68,120 @@ public class Quoridor extends BoardGame {
             this.teamSigns.add(teamName.substring(0, 1).toUpperCase());
         }
     }
-    // check if a player can reach the destination
-    public boolean checkSolvable(QuoridorPlayer player) {
-        return true;
+
+    // DONE: check if a player can reach the destination after adding a new wall
+    public boolean checkSolvable(int x, int y, String choice, QuoridorPlayer player) {
+        int r = player.getRow();
+        int c = player.getCol();
+        int R = this.board.getRowNum();
+        int C = this.board.getColNum();
+        boolean[][] visited = new boolean[R][C];
+        for(int i = 0; i < R; i++){
+            for(int j = 0; j < C; j++){
+                visited[i][j] = false;
+            }
+        }
+        // add the wall to board, later erase it
+        if(choice.equals("1")) {
+            Piece newEdgPiece = new Piece(this.colorList.get(player.getTeamNo() - 1));
+            this.board.getTile(x - 1, y - 1).setPiece(newEdgPiece, 2);
+            this.board.getTile(x - 1, y).setPiece(newEdgPiece, 2);
+            this.board.getTile(x, y - 1).setPiece(newEdgPiece, 1);
+            this.board.getTile(x, y).setPiece(newEdgPiece, 1);
+        }
+        if(choice.equals("2")) {
+            Piece newEdgPiece = new Piece(this.colorList.get(player.getTeamNo() - 1));
+            this.board.getTile(x - 1, y - 1).setPiece(newEdgPiece, 4);
+            this.board.getTile(x - 1, y).setPiece(newEdgPiece, 3);
+            this.board.getTile(x, y - 1).setPiece(newEdgPiece, 4);
+            this.board.getTile(x, y).setPiece(newEdgPiece, 3);
+        }
+        // DFS
+        boolean res = dfs(r, c, R, C, visited, player);
+        // erase it
+        if(choice.equals("1")) {
+            Piece newEdgPiece = null;
+            this.board.getTile(x - 1, y - 1).setPiece(newEdgPiece, 2);
+            this.board.getTile(x - 1, y).setPiece(newEdgPiece, 2);
+            this.board.getTile(x, y - 1).setPiece(newEdgPiece, 1);
+            this.board.getTile(x, y).setPiece(newEdgPiece, 1);
+        }
+        if(choice.equals("2")) {
+            Piece newEdgPiece = null;
+            this.board.getTile(x - 1, y - 1).setPiece(newEdgPiece, 4);
+            this.board.getTile(x - 1, y).setPiece(newEdgPiece, 3);
+            this.board.getTile(x, y - 1).setPiece(newEdgPiece, 4);
+            this.board.getTile(x, y).setPiece(newEdgPiece, 3);
+        }
+
+//        System.out.printf("player.r = %d, player.c = %d, player.teamno = %d, checkSolvable() returns %b\n", r, c, player.getTeamNo(), res);
+        return res;
     }
-    // check if the wall collide with other walls
-    public boolean checkCollision(){
+
+    private boolean dfs(int r, int c, int R, int C, boolean[][] visited, QuoridorPlayer player) {
+        // param r, c should never be out of range
+        assert 0 <= r && r <= R-1 && 0 <= c && c <= C-1;
+        visited[r][c] = true;
+        // if player can reach the destination
+        if(
+            player.getTeamNo() == 1 && r == R-1 ||
+            player.getTeamNo() == 2 && r == 0 ||
+            player.getTeamNo() == 3 && c == C-1 ||
+            player.getTeamNo() == 4 && c == 0
+        ){
+            return true;
+        }
+        Tile currentTile = this.board.getTile(r, c);
+
+        int[][] directions = new int[][]{{-1, 0}, {+1, 0}, {0, -1}, {0, +1}};
+        for(int i = 1; i <= 4; i++) { // up -> down -> left -> right
+            int rr = r + directions[i-1][0];
+            int cc = c + directions[i-1][1];
+            // if rr/cc out of range then skip this direction
+            if (rr < 0 || rr > R-1 || cc < 0 || cc > C-1) {
+                continue;
+            }
+            // if blocked by a wall then skip this direction
+            // IMPORTANT: Here the new wall has NOT been updated in the Board!!
+            if (currentTile.getPiece(i) != null) {
+                continue;
+            }
+            // if already DFS the nextTile skip this direction
+            if (visited[rr][cc]) {
+                continue;
+            }
+            boolean res = dfs(rr, cc, R, C, visited, player);
+            if(res) {
+//                System.out.println(currentTile.getPiece(1) + " " + currentTile.getPiece(2) + " " + currentTile.getPiece(3) + " " + currentTile.getPiece(4));
+//                System.out.printf("%b %b %b %b\n", currentTile.getPiece(1) != null, currentTile.getPiece(2) != null ,currentTile.getPiece(3) != null, currentTile.getPiece(4) != null);
+//                System.out.printf("i=%d, %b\n", i, currentTile.getPiece(i) != null);
+//                System.out.printf("dfs(%d, %d) returns true cuz dfs(%d, %d) returns true\n", r, c, rr, cc);
+                return true;
+            }
+        }
         return false;
+    }
+
+
+
+    // DONE: check if the wall collide with other walls
+    public boolean checkCollision(int x, int y, String choice){
+        // Piece index: 0 center 1 top 2 bottom 3 left 4 right
+        Piece top = this.board.getTile(x - 1, y - 1).getPiece(4);
+        Piece bottom = this.board.getTile(x, y - 1).getPiece(4);
+        Piece left = this.board.getTile(x - 1, y - 1).getPiece(2);
+        Piece right = this.board.getTile(x - 1, y).getPiece(2);
+
+        if(choice.equals("1")){ // try to add a horizontal line
+            boolean verticalOk = (top == null || bottom == null || !top.getColor().equals(bottom.getColor()));
+            boolean horizontalOk = (left == null && right == null);
+            return verticalOk && horizontalOk;
+        } else{ // try to add a vertical line
+            boolean verticalOk = (top == null && bottom == null);
+            boolean horizontalOk = (left == null || right == null || !left.getColor().equals(right.getColor()));
+            return verticalOk && horizontalOk;
+        }
+
     }
     // add a wall to the board, return true if a wall is added successfully
     public boolean addAWall(int teamNo) {
@@ -84,19 +191,36 @@ public class Quoridor extends BoardGame {
             System.out.println("You don't have any walls left!");
             return false;
         }
-        // ask for coordinates
-        System.out.println("Where would you like to add the wall? Please input xy coordinate, x for row and y for column.");
-        int x = InputHandler.getAnIntegerInARange("X coordinate", 1, this.board.getRowNum() - 1);
-        int y = InputHandler.getAnIntegerInARange("Y coordinate", 1, this.board.getColNum() - 1);
-        // ask the user to input the direction of the wall
-        String prompt = "Please input the direction of the wall. 1: horizontal; 2: vertical; q: return. Your choice is: ";
-        String[] validStrings = new String[]{"1", "2", "q", "Q"};
-        String choice = InputHandler.getAValidChoiceString(prompt, validStrings);
-        if(choice.equalsIgnoreCase("q")) {
-            return false;
-        }
-        // check collision and solvable
+
+        boolean ok = false;
+        int x = -1, y = -1;
+        String choice = "-1";
+        do {
+            // ask for coordinates
+            System.out.println("Where would you like to add the wall? Please input xy coordinate, x for row and y for column.");
+            x = InputHandler.getAnIntegerInARange("X coordinate", 1, this.board.getRowNum() - 1);
+            y = InputHandler.getAnIntegerInARange("Y coordinate", 1, this.board.getColNum() - 1);
+            // ask the user to input the direction of the wall
+            String prompt = "Please input the direction of the wall. 1: horizontal; 2: vertical; q: return. Your choice is: ";
+            String[] validStrings = new String[]{"1", "2", "q", "Q"};
+            choice = InputHandler.getAValidChoiceString(prompt, validStrings);
+            if(choice.equalsIgnoreCase("q")) {
+                return false;
+            }
+            // DONE: check collision and solvable
+            boolean collisionOk = checkCollision(x, y, choice);
+            if (!collisionOk) {
+                System.out.println(" -- Invalid choice - collision detected. Please select the wall again.");
+            }
+            boolean solvableOk = checkSolvable(x, y, choice, player);
+            if (collisionOk && !solvableOk) {
+                System.out.println(" -- Invalid choice - unsolvable detected. Please select the wall again.");
+            }
+            ok = collisionOk && solvableOk;
+        } while(!ok);
+
         // add the wall to the board
+        // Piece index: 0 center 1 top 2 bottom 3 left 4 right
         if(choice.equals("1")) {
             Piece newEdgPiece = new Piece(this.colorList.get(teamNo - 1));
             this.board.getTile(x - 1, y - 1).setPiece(newEdgPiece, 2);
