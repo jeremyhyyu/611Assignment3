@@ -71,16 +71,8 @@ public class Quoridor extends BoardGame {
 
     // DONE: check if a player can reach the destination after adding a new wall
     public boolean checkSolvable(int x, int y, String choice, QuoridorPlayer player) {
-        int r = player.getRow();
-        int c = player.getCol();
         int R = this.board.getRowNum();
         int C = this.board.getColNum();
-        boolean[][] visited = new boolean[R][C];
-        for(int i = 0; i < R; i++){
-            for(int j = 0; j < C; j++){
-                visited[i][j] = false;
-            }
-        }
         // add the wall to board, later erase it
         if(choice.equals("1")) {
             Piece newEdgPiece = new Piece(this.colorList.get(player.getTeamNo() - 1));
@@ -96,8 +88,21 @@ public class Quoridor extends BoardGame {
             this.board.getTile(x, y - 1).setPiece(newEdgPiece, 4);
             this.board.getTile(x, y).setPiece(newEdgPiece, 3);
         }
-        // DFS
-        boolean res = dfs(r, c, R, C, visited, player);
+        // DFS for all players
+        boolean res = true;
+        for(Team team: this.teams) {
+            QuoridorPlayer quoridorPlayer = (QuoridorPlayer)team.getCurrentPlayer(); 
+            boolean[][] visited = new boolean[R][C];
+            for(int i = 0; i < R; i++){
+                for(int j = 0; j < C; j++){
+                    visited[i][j] = false;
+                }
+            }
+            int r = quoridorPlayer.getRow();
+            int c = quoridorPlayer.getCol();
+            res = dfs(r, c, R, C, visited, quoridorPlayer);
+            if(!res) break;
+        }
         // erase it
         if(choice.equals("1")) {
             Piece newEdgPiece = null;
@@ -211,6 +216,7 @@ public class Quoridor extends BoardGame {
             boolean collisionOk = checkCollision(x, y, choice);
             if (!collisionOk) {
                 System.out.println(" -- Invalid choice - collision detected. Please select the wall again.");
+                continue;
             }
             boolean solvableOk = checkSolvable(x, y, choice, player);
             if (collisionOk && !solvableOk) {
